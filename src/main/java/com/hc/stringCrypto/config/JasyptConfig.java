@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
@@ -26,8 +26,8 @@ public class JasyptConfig {
     private int keyObtentionIterations;
 
     @Bean
-    public StringEncryptor jasyptStringEncryptor(){
-        PooledPBEStringEncryptor encryptor= new PooledPBEStringEncryptor();
+    public StringEncryptor jasyptStringEncryptor() {
+        PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         encryptor.setPoolSize(poolSize);
         encryptor.setAlgorithm(algorithm);
         encryptor.setStringOutputType(stringOutputType);
@@ -39,10 +39,26 @@ public class JasyptConfig {
     private String getJasyptEncryptorPassword() {
         try {
             ClassPathResource resource = new ClassPathResource("jasypt-encryptor-password.txt");
-            return Files.readAllLines(Paths.get(resource.getURI())).stream()
-                    .collect(Collectors.joining(""));
+            InputStream inputStream=resource.getInputStream();
+            Reader reader = new InputStreamReader(inputStream);
+
+            StringBuilder result = new StringBuilder();
+
+            for (int data = reader.read(); data != -1; data = reader.read()) {
+                result.append((char)data);
+            }
+            return result.toString();
+
+//            return Files.readAllLines(Paths.get(resource.getURI())).stream()
+//                    .collect(Collectors.joining(""));
         } catch (IOException e) {
             throw new RuntimeException("Not found Jasypt password file.");
         }
     }
+
+    public StringEncryptor encryptor() {
+        StringEncryptor encryptor = jasyptStringEncryptor();
+        return encryptor;
+    }
+
 }
