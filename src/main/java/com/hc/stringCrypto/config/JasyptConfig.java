@@ -49,8 +49,6 @@ public class JasyptConfig {
             }
             return result.toString();
 
-//            return Files.readAllLines(Paths.get(resource.getURI())).stream()
-//                    .collect(Collectors.joining(""));
         } catch (IOException e) {
             throw new RuntimeException("Not found Jasypt password file.");
         }
